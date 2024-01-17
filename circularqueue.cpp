@@ -25,6 +25,7 @@ class Queue {
             rear++;
             if ((front!=0)&&(front==rear)){
                 cout<<"Queue is full..."<<endl;
+                rear--;
                 return;
             }
             rear = rear%size;
@@ -40,6 +41,10 @@ class Queue {
             }
             data = q[front];
             front++;
+            if ((rear+1)==front){
+                front = -1;
+                rear = -1;
+            }
             front = front % size;
             cout<<"dequeue"<<endl;
             cout<<"front = "<<front;
@@ -50,9 +55,20 @@ class Queue {
             int i;
             cout<<"---------------"<<endl;
             cout<<"Elements of Queue.."<<endl;
-            for (i=front;i<=rear;i++){
-                cout<<q[i]<<endl;
+            if (rear<front){
+                for (i=front;i<(size);i++){
+                    cout<<q[i]<<endl;
+                }
+                for (i=0;i<=rear;i++){
+                    cout<<q[i]<<endl;
+                }
             }
+            else {
+                for (i=front;i<=rear;i++){
+                    cout<<q[i]<<endl;
+                }
+            }
+            
             cout<<"---------------"<<endl;
         }
 };
@@ -63,8 +79,6 @@ int main() {
     q.enqueue(10);
     q.enqueue(15);
     q.enqueue(20);
-    q.show();
-    cout<<"Elements Deleted: "<<q.dequeue()<<endl;
     q.show();
     cout<<"Elements Deleted: "<<q.dequeue()<<endl;
     q.show();
