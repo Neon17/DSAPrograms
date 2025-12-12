@@ -80,66 +80,10 @@ vector<Task> taskPriority(vector<Task> tasks1, int maxHours)
 
     if (tasks1.size() == 1)
     {
-        return tasks1;
-    }
-
-    if (tasks1.size() == 2)
-    {
-        // cout<<"reached size 2 base case"<<endl;
-        temp.push_back(tasks1[0]);
-        temp.push_back(tasks1[1]);
-
-        int tempha = tasks1[0].estimated_hours;
-        int temphb = tasks1[1].estimated_hours;
-
-        int temppa = tasks1[0].priority;
-        int temppb = tasks1[1].priority;
-
-        if (maxHours >= (tempha + temphb))
+        if (tasks1[0].estimated_hours <= maxHours)
         {
-            tempHours = tempha + temphb;
-            tempPriority = temppa + temppb;
-            answer = temp;
+            answer.push_back(tasks1[0]);
         }
-        else if (maxHours >= tempha && maxHours >= temphb)
-        {
-            // Both fit individually - take the higher priority one
-            if (temppa >= temppb)
-            {
-                tempHours = tempha;
-                tempPriority = temppa;
-                answer = {tasks1[0]};
-            }
-            else
-            {
-                tempHours = temphb;
-                tempPriority = temppb;
-                answer = {tasks1[1]};
-            }
-        }
-        else if (maxHours >= tempha)
-        {
-            tempHours = tempha;
-            tempPriority = temppa;
-            answer = {tasks1[0]};
-        }
-        else if (maxHours >= temphb)
-        {
-            tempHours = temphb;
-            tempPriority = temppb;
-            answer = {tasks1[1]};
-        }
-        else
-        {
-            tempHours = 0;
-            tempPriority = 0;
-            answer.clear();
-            return answer;
-        }
-
-        // cout<<"tempHours = " << tempHours << ", tempPriority = " << tempPriority << endl;
-        // cout<<"answer = ";
-        // printTask(answer);
         return answer;
     }
 
