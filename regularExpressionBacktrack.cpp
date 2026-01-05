@@ -6,7 +6,8 @@ using namespace std;
 // we are considering only '.' and '*' special characters here
 
 // leverage is "true" when . hit and "a" if a* hit
-void matchPattern(string s, string p, bool &match, int sindex = 0, int pindex = 0, string leverage = "")
+void matchPattern(string s, string p, bool &match, int sindex = 0,
+                  int pindex = 0, string leverage = "")
 {
     if (match)
         return;
@@ -17,8 +18,10 @@ void matchPattern(string s, string p, bool &match, int sindex = 0, int pindex = 
     }
     if ((pindex + 1 >= p.size()) && (sindex + 1 >= s.size()))
     {
-        // * means 0 or unlimited times previous term if abc* then it can be abc or abcabc or abcc, abcb
-        if ((p[pindex] == '.') || (p[pindex] == s[sindex]) || (leverage == "true") || (p[pindex] == '*'))
+        // * means 0 or unlimited times previous term if abc* then it can be
+        // abc or abcabc or abcc, abcb
+        if ((p[pindex] == '.') || (p[pindex] == s[sindex]) ||
+            (p[pindex] == '*'))
             match = true;
         return;
     }
@@ -27,9 +30,13 @@ void matchPattern(string s, string p, bool &match, int sindex = 0, int pindex = 
         match = false;
         return;
     }
+
+    if (pindex >= p.size())
+        return;
+
     if (pindex < p.size() && p[pindex] == '.')
     {
-        if (p[pindex + 1] == '*')
+        if (pindex + 1 < p.size() && p[pindex + 1] == '*')
         {
             int ptest = -1;
             for (int i = pindex + 2; i < p.size(); i++)
@@ -63,24 +70,31 @@ void matchPattern(string s, string p, bool &match, int sindex = 0, int pindex = 
     }
     else if (pindex < p.size() && p[pindex] == '*')
     {
-        string leve = "";
-        leve += s[sindex];
-        if ((leverage == leve) || (p[pindex - 1] == s[sindex]))
+        if (pindex > 0)
         {
-            string temp = leverage;
-            if ((leverage == "true") || (leverage == ""))
-                temp = p[pindex - 1] + "";
-            else
-                temp = leverage;
-            matchPattern(s, p, match, sindex + 1, pindex + 1, temp);
+            string leve = "";
+            leve += s[sindex];
+            if ((leverage == leve) || (p[pindex - 1] == s[sindex]))
+            {
+                string temp = leverage;
+                if ((leverage == "true") || (leverage == ""))
+                    temp = p[pindex - 1] + "";
+                else
+                    temp = leverage;
+                matchPattern(s, p, match, sindex + 1, pindex + 1, temp);
+            }
         }
         matchPattern(s, p, match, sindex, pindex + 1, leverage);
     }
-    else if ((pindex < p.size()) && (p[pindex] == s[sindex]) && ((pindex + 1) >= p.size()) || (p[pindex + 1] != '*'))
+    else if ((pindex < p.size()) && (p[pindex] == s[sindex]) &&
+             ((pindex + 1) >= p.size() ||
+              (pindex + 1 < p.size() && p[pindex + 1] != '*')))
     {
         matchPattern(s, p, match, sindex + 1, pindex + 1, "");
     }
-    else if ((p[pindex] == s[sindex]) && (p[pindex + 1] == '*'))
+    else if ((pindex < p.size() && sindex < s.size()) &&
+             (p[pindex] == s[sindex]) &&
+             (pindex + 1 < p.size() && p[pindex + 1] == '*'))
     {
         string leve = "";
         leve += s[sindex];
@@ -95,8 +109,14 @@ void matchPattern(string s, string p, bool &match, int sindex = 0, int pindex = 
         } // pindex size can go beyond p.size()
         for (int i = sindex; i <= ptest + 1; i++)
         {
-            matchPattern(s, p, match, i, pindex + 2, leve);
+            if (pindex + 2 <= p.size())
+                matchPattern(s, p, match, i, pindex + 2, leve);
         }
+    }
+    else if ((pindex < p.size()) &&
+             (pindex + 1 < p.size() && p[pindex + 1] == '*'))
+    {
+        matchPattern(s, p, match, sindex, pindex + 2, "");
     }
     else if ((sindex < s.size()) && (leverage == string(1, s[sindex])))
     {
@@ -117,8 +137,8 @@ int main()
     // p = "a*a*c"; // should return false
     // s = "aaabbbccc";
     // p = "a*b*c*.*"; // should return true
-    // s = "mississippi";
-    // p = "mis*is*ip*i"; // should return true
+    s = "mississippi";
+    p = "mis*is*ip*."; // should return true
     // s = "abc";
     // p = "a*.*b*.*c*.*"; // should return true
     // s = "aaaa";
@@ -197,6 +217,24 @@ int main()
 
     // s = "zzzzzzzzzzzzzzzzzzzz";
     // p = "z*z*z*z*z*z*z*z*z*z*"; // should return true
+
+    // s = "aab";
+    // p = "c*a*b"; // should return true
+
+    // s = "ab";
+    // p = ".*c"; // should return false
+
+    // s = "a";
+    // p = "ab*"; // should return true
+
+    // s = "ab";
+    // p = ".*..c*"; // should return true
+
+    // s = "ab";
+    // p = ".*...c*"; // should return false
+
+    // s = "a";
+    // p = ".*.."; // should return false
 
     matchPattern(s, p, match);
     cout << "Match = " << match << endl;
