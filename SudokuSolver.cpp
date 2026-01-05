@@ -19,32 +19,7 @@ bool isSafe(vector<vector<char>>& board, int row, int col){
             if (board[row][col] == board[row][i]) return false;
         }
     }
-    int startx=0, starty=0;
-    if (row < 3){
-        if (col < 3){
-            startx = 0; starty= 0;
-        } else if (col>=3 && col < 6){
-            startx = 0; starty= 3;
-        } else {
-            startx = 0; starty= 6;
-        }
-    } else if (row >= 3 && row < 6){
-        if (col < 3){
-            startx = 3; starty= 0;
-        } else if (col>=3 && col < 6){
-            startx = 3; starty= 3;
-        } else {
-            startx = 3; starty= 6;
-        }
-    } else {
-        if (col < 3){
-            startx = 6; starty= 0;
-        } else if (col>=3 && col < 6){
-            startx = 6; starty= 3;
-        } else {
-            startx = 6; starty= 6;
-        }
-    }
+    int startx= row/3 * 3, starty= col/3 * 3;
     for (int i=startx; i<(startx+3); i++){
         for (int j=starty; j<(starty+3); j++){
             if (row == i && col == j) continue;
@@ -56,7 +31,6 @@ bool isSafe(vector<vector<char>>& board, int row, int col){
 
 void solveSudoku(vector<vector<char>>& board, bool& solved, int row=0, int col=0){
     if (solved) return;
-    if (row > board.size() || col > board.size()) return;
     if (row != board.size() && col == board.size()){
         row = row + 1; 
         col = 0;
@@ -114,7 +88,8 @@ int main() {
     //     {'.', '.', '.', '8', '.', '9', '.', '5', '.'},
     //     {'.', '7', '.', '.', '.', '.', '.', '4', '.'},
     //     {'.', '2', '.', '.', '.', '.', '.', '.', '.'}
-    // }; fails on this
+    // }; 
+    // fails on this
 
     bool solved = false;
     solveSudoku(board, solved);
