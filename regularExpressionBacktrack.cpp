@@ -4,124 +4,78 @@ using namespace std;
 
 // we can solve regex matching using backtracking
 // we are considering only '.' and '*' special characters here
+// leetcode 10. Regular Expression Matching (Hard Problem)
 
-// leverage is "true" when . hit and "a" if a* hit
 void matchPattern(string s, string p, bool &match, int sindex = 0,
-                  int pindex = 0, string leverage = "")
+                  int pindex = 0)
 {
     if (match)
         return;
-    if (pindex >= p.size() && leverage == "true")
+
+    if (sindex == s.size() && pindex == p.size())
     {
         match = true;
         return;
     }
-    if ((pindex + 1 >= p.size()) && (sindex + 1 >= s.size()))
-    {
-        // * means 0 or unlimited times previous term if abc* then it can be
-        // abc or abcabc or abcc, abcb
-        if ((p[pindex] == '.') || (p[pindex] == s[sindex]) ||
-            (p[pindex] == '*'))
-            match = true;
-        return;
-    }
-    else if ((sindex > s.size()))
-    {
-        match = false;
-        return;
-    }
 
-    if (pindex >= p.size())
+    else if (sindex > s.size())
+        return;
+    else if (pindex > p.size())
         return;
 
-    if (pindex < p.size() && p[pindex] == '.')
+    int stest = -1, ptest = -1;
+
+    if (pindex + 1 < p.size() && p[pindex + 1] == '*')
     {
-        if (pindex + 1 < p.size() && p[pindex + 1] == '*')
+        ptest = pindex + 1;
+        for (int i = ptest; i < p.size(); i++)
         {
-            int ptest = -1;
-            for (int i = pindex + 2; i < p.size(); i++)
+            if (p[i] != '*')
             {
-                if (p[i] != '*')
+                ptest = i;
+                break;
+            }
+        }
+        if (ptest == pindex + 1)
+            ptest = p.size();
+        if (p[pindex] == s[sindex])
+        {
+
+            stest = sindex;
+            for (int i = sindex; i <= s.size(); i++)
+            {
+                if (s[i] != s[sindex])
                 {
-                    ptest = i;
+                    stest = i;
                     break;
                 }
             }
-            if (ptest == -1)
-                ptest = p.size();
-            if (sindex + 1 >= s.size())
+            if (stest == sindex)
+                stest = s.size();
+
+            for (int i = sindex; i <= stest; i++)
             {
-                matchPattern(s, p, match, sindex, ptest, "true");
-                return;
+                matchPattern(s, p, match, i, ptest);
             }
-            for (int i = sindex; i < s.size(); i++)
+        }
+        else if (p[pindex] == '.')
+        {
+            for (int i = sindex; i <= s.size(); i++)
             {
-                matchPattern(s, p, match, i, ptest, "true");
+                matchPattern(s, p, match, i, ptest);
             }
         }
         else
         {
-            if (sindex + 1 >= s.size())
-            {
-                return;
-            }
-            matchPattern(s, p, match, sindex + 1, pindex + 1, "");
+            matchPattern(s, p, match, sindex, ptest);
         }
     }
-    else if (pindex < p.size() && p[pindex] == '*')
+    else
     {
-        if (pindex > 0)
+        if (p[pindex] == s[sindex] || p[pindex] == '.')
         {
-            string leve = "";
-            leve += s[sindex];
-            if ((leverage == leve) || (p[pindex - 1] == s[sindex]))
-            {
-                string temp = leverage;
-                if ((leverage == "true") || (leverage == ""))
-                    temp = p[pindex - 1] + "";
-                else
-                    temp = leverage;
-                matchPattern(s, p, match, sindex + 1, pindex + 1, temp);
-            }
+            matchPattern(s, p, match, sindex + 1, pindex + 1);
         }
-        matchPattern(s, p, match, sindex, pindex + 1, leverage);
-    }
-    else if ((pindex < p.size()) && (p[pindex] == s[sindex]) &&
-             ((pindex + 1) >= p.size() ||
-              (pindex + 1 < p.size() && p[pindex + 1] != '*')))
-    {
-        matchPattern(s, p, match, sindex + 1, pindex + 1, "");
-    }
-    else if ((pindex < p.size() && sindex < s.size()) &&
-             (p[pindex] == s[sindex]) &&
-             (pindex + 1 < p.size() && p[pindex + 1] == '*'))
-    {
-        string leve = "";
-        leve += s[sindex];
-        // find up to where s and p[pindex] match
-        int ptest = sindex;
-        for (int i = sindex; i < s.size(); i++)
-        {
-            if (s[i] == p[pindex])
-                ptest = i;
-            else
-                break;
-        } // pindex size can go beyond p.size()
-        for (int i = sindex; i <= ptest + 1; i++)
-        {
-            if (pindex + 2 <= p.size())
-                matchPattern(s, p, match, i, pindex + 2, leve);
-        }
-    }
-    else if ((pindex < p.size()) &&
-             (pindex + 1 < p.size() && p[pindex + 1] == '*'))
-    {
-        matchPattern(s, p, match, sindex, pindex + 2, "");
-    }
-    else if ((sindex < s.size()) && (leverage == string(1, s[sindex])))
-    {
-        matchPattern(s, p, match, sindex + 1, pindex, leverage);
-        matchPattern(s, p, match, sindex, pindex + 1, leverage);
     }
 }
 
@@ -137,8 +91,8 @@ int main()
     // p = "a*a*c"; // should return false
     // s = "aaabbbccc";
     // p = "a*b*c*.*"; // should return true
-    s = "mississippi";
-    p = "mis*is*ip*."; // should return true
+    // s = "mississippi";
+    // p = "mis*is*ip*."; // should return true
     // s = "abc";
     // p = "a*.*b*.*c*.*"; // should return true
     // s = "aaaa";
@@ -146,8 +100,8 @@ int main()
     // s = "ab"; p = ".*c"; // should return false
     // s = "a"; p = ".*..a*"; // should return false
 
-    // s = "aaaaaaaaaaaaaaaaaaaa"; // 20 a's
-    // p = "a*a*a*a*a*a*a*a*a*a*"; // should return true
+    s = "aaaaaaaaaaaaaaaaaaab"; // 20 a's
+    p = "a*a*a*a*a*a*a*a*a*a*"; // should return true
 
     // s = "abcdeabcdeabcdeabcde";
     // p = ".*abc.*de.*"; // should return true
@@ -185,7 +139,7 @@ int main()
     // p = "a*..*b*..*c*..*"; // should return true
 
     // s = "abcabcabcabcabcabcab";
-    // p = ".*abc.*abc.*abc.*abc"; // should return true => fail
+    // p = ".*abc.*abc.*abc.*abc"; // should return false
 
     // s = "mmmmiiiiissssssssspp";
     // p = "m*i*s*p*.*"; // should return true
