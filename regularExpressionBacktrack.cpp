@@ -6,6 +6,8 @@ using namespace std;
 // we are considering only '.' and '*' special characters here
 // leetcode 10. Regular Expression Matching (Hard Problem)
 
+vector<vector<int>> visited; // -1=not visited, 0=already visited
+
 void matchPattern(string s, string p, bool &match, int sindex = 0,
                   int pindex = 0)
 {
@@ -21,6 +23,9 @@ void matchPattern(string s, string p, bool &match, int sindex = 0,
     else if (sindex > s.size())
         return;
     else if (pindex > p.size())
+        return;
+
+    if (visited[sindex][pindex] != -1)
         return;
 
     int stest = -1, ptest = -1;
@@ -56,6 +61,10 @@ void matchPattern(string s, string p, bool &match, int sindex = 0,
             for (int i = sindex; i <= stest; i++)
             {
                 matchPattern(s, p, match, i, ptest);
+                if (ptest < p.size() && i < s.size())
+                {
+                    visited[i][ptest] = 0;
+                }
             }
         }
         else if (p[pindex] == '.')
@@ -63,11 +72,19 @@ void matchPattern(string s, string p, bool &match, int sindex = 0,
             for (int i = sindex; i <= s.size(); i++)
             {
                 matchPattern(s, p, match, i, ptest);
+                if (ptest < p.size() && i < s.size())
+                {
+                    visited[i][ptest] = 0;
+                }
             }
         }
         else
         {
             matchPattern(s, p, match, sindex, ptest);
+            if (ptest < p.size() && sindex < s.size())
+            {
+                visited[sindex][ptest] = 0;
+            }
         }
     }
     else
@@ -75,6 +92,10 @@ void matchPattern(string s, string p, bool &match, int sindex = 0,
         if (p[pindex] == s[sindex] || p[pindex] == '.')
         {
             matchPattern(s, p, match, sindex + 1, pindex + 1);
+            if (pindex < p.size() && sindex < s.size())
+            {
+                visited[sindex][pindex] = 0;
+            }
         }
     }
 }
@@ -100,8 +121,8 @@ int main()
     // s = "ab"; p = ".*c"; // should return false
     // s = "a"; p = ".*..a*"; // should return false
 
-    s = "aaaaaaaaaaaaaaaaaaab"; // 20 a's
-    p = "a*a*a*a*a*a*a*a*a*a*"; // should return true
+    // s = "aaaaaaaaaaaaaaaaaaab"; // 20 a's
+    // p = "a*a*a*a*a*a*a*a*a*a*"; // should return false
 
     // s = "abcdeabcdeabcdeabcde";
     // p = ".*abc.*de.*"; // should return true
@@ -110,7 +131,7 @@ int main()
     // p = "a*aa*aaa*aaaa*aaaaa*"; // should return true
 
     // s = "mississippimississip";
-    // p = "mis*is*ip*mi*s*i*s*ip*"; // should return true => fail
+    // p = "mis*is*ip*mi*s*i*s*ip*"; // should return false
 
     // s = "abababababababababab";
     // p = "(ab)*.*"; // should return false - pattern invalid (has '(')
@@ -181,14 +202,16 @@ int main()
     // s = "a";
     // p = "ab*"; // should return true
 
-    // s = "ab";
-    // p = ".*..c*"; // should return true
+    s = "ab";
+    p = ".*..c*"; // should return true
 
     // s = "ab";
     // p = ".*...c*"; // should return false
 
     // s = "a";
     // p = ".*.."; // should return false
+
+    visited = vector<vector<int>>(s.size() + 1, vector<int>(p.size() + 1, -1));
 
     matchPattern(s, p, match);
     cout << "Match = " << match << endl;
