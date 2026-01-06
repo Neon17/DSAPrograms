@@ -1,0 +1,7 @@
+//Graph Theory Problem Solving
+// Input should in below format
+// 2  
+// 3 2  
+// 5 4 7  
+// 5 1  
+// 5 3 4 5 6
