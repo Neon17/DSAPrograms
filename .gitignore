@@ -1,5 +1,8 @@
-/*.exe
 /*
+/*.exe
+!/*.cpp
+!/*.c
+!/*.js
 !/Problem Solving
 /Problem Solving/*
 !/Problem Solving/*.*
