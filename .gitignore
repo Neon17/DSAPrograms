@@ -7,3 +7,7 @@
 /Problem Solving/*
 !/Problem Solving/*.*
 /Problem Solving/*.exe
+!/heap
+/heap/*
+!/heap/*.*
+/heap/*.exe

@@ -1,21 +1,5 @@
 {
     "configurations": [
-        // It is commented because I am using Linux
-        // {
-        //     "name": "Win32",
-        //     "includePath": [
-        //         "${workspaceFolder}/**"
-        //     ],
-        //     "defines": [
-        //         "_DEBUG",
-        //         "UNICODE",
-        //         "_UNICODE"
-        //     ],
-        //     "cStandard": "c11",
-        //     "cppStandard": "gnu++17",
-        //     "intelliSenseMode": "windows-gcc-x86",
-        //     "compilerPath": "/usr/bin/gcc"
-        // },
         {
             "name": "Linux",
             "includePath": [
@@ -26,6 +10,30 @@
             "cStandard": "c17",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64"
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "d:/DSAPrograms/**",
+                "D:\\mingw-new\\include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "mergeConfigurations": false,
+            "recursiveIncludes": {},
+            "compilerPath": "D:/mingw-new/bin/g++.exe",
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "compilerArgs": [
+                "-static-libgcc",
+                "-static-libstdc++",
+                "-static-libgcc",
+                "-static-libstdc++"
+            ]
         }
     ],
     "version": 4
