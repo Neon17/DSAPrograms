@@ -11,3 +11,6 @@
 /heap/*
 !/heap/*.*
 /heap/*.exe
+!/leetcodehard
+/leetcodehard/*
+!/leetcodehard/*.*
