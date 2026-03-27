@@ -21,6 +21,9 @@
 
  /**
   * This is totally my solution
+  * I solved it by using a decreasing monotonic stack to store the height and index of the bars, and a dp array to store the area of water trapped at each index
+  * The stack is used to find the left and right boundaries of the water trapped, and the dp array is used to store the area of water trapped at each index, which is then summed up to get the total area of water trapped
+  * The time complexity is O(n) and the space complexity is O(n)
   */
 
  #include<iostream>
