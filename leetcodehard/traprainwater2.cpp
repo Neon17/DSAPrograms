@@ -27,6 +27,22 @@
  *
  */
 
+/**
+ * My previous solution was to do BFS from each cell and find the minimum height of the surrounding cells. 
+ * I was doing BFS from each cell and continuing until I find a cell that is higher than the current cell. 
+ * Then, I was calculating the water trapped in that cell and adding it to the total area.
+ * Then, I was updating the height of the current cell to the minimum height of the surrounding cells.
+ * This was giving me TLE because of the large input size.
+ * Also, it was not giving the correct answer because I was not considering the case where there are multiple cells with the same height.
+ */
+
+/**
+ * Later, I asked for hint on deepseek and got hint to use priority queue
+ * The idea was to push all border cells into the priority queue and then do BFS from the border cells.
+ * The priority queue will always give us the cell with the minimum height.
+ * We will pop the cell from the priority queue and then check its neighbors and update accordingly.
+ */
+
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -37,197 +53,60 @@ using namespace std;
 
 class Solution
 {
-    unordered_set<string> visited; // stored as "i,j"
-    unordered_set<string> collected; // already calculated area of and increase level size
-    unordered_set<string> calculated;
+   
 public:
-    int surrounding(vector<vector<int>> &heightMap, int i = 0, int j = 0)
-    {
-        // returns min height
-        int up = __INT32_MAX__, down = __INT32_MAX__, left = __INT32_MAX__, right = __INT32_MAX__;
-
-        if (i > 0)
-            up = heightMap[i - 1][j];
-        if (i < (heightMap.size() - 1))
-            down = heightMap[i + 1][j];
-        if (j > 0)
-            left = heightMap[i][j - 1];
-        if (j < (heightMap[0].size() - 1))
-            right = heightMap[i][j + 1];
-
-        int min1, min2, min3, minIndex1, minIndex2, minIndex3;
-
-        min1 = min(up, down);
-        min2 = min(left, right);
-        min3 = min(min1, min2);
-        return min3;
-    }
-
-    int maxSurrounding(vector<vector<int>> &heightMap, int i=0, int j=0){
-        // returns min height
-        int up = __INT32_MAX__, down = __INT32_MAX__, left = __INT32_MAX__, right = __INT32_MAX__;
-
-        if (i > 0 && (collected.find(to_string(i-1) + "," + to_string(j)) == collected.end()))
-            up = heightMap[i - 1][j];
-        if (i < (heightMap.size() - 1) && (collected.find(to_string(i+1) + "," + to_string(j)) == collected.end()))
-            down = heightMap[i + 1][j];
-        if (j > 0 && (collected.find(to_string(i) + "," + to_string(j-1)) == collected.end()))
-            left = heightMap[i][j - 1];
-        if (j < (heightMap[0].size() - 1) && (collected.find(to_string(i) + "," + to_string(j+1)) == collected.end()))
-            right = heightMap[i][j + 1];
-
-        int min1, min2, min3, minIndex1, minIndex2, minIndex3;
-
-        min1 = min(up, down);
-        min2 = min(left, right);
-        min3 = min(min1, min2);
-
-        if (min3 == __INT32_MAX__) return surrounding(heightMap, i, j);
-        return min3;
-    }
-
-    vector<string> split_string_find(string s, const string& delimiter) {
-        vector<string> tokens;
-        size_t pos = 0;
-        string token;
-        while ((pos = s.find(delimiter)) != string::npos) {
-            token = s.substr(0, pos);
-            tokens.push_back(token);
-            s.erase(0, pos + delimiter.length());
-        }
-        tokens.push_back(s);
-        return tokens;
-    }
-
-    int findActualHeight(vector<vector<int>> &heightMap, int i=0, int j=0){
-        // find actual min height of border that is not in collected
-        // after that remove collected
-        // because it is end of contiguous one
-        // we have do bfs to find border and find min height of border
-
-        int minheight =  __INT32_MAX__;
-        int row = 0, col = 0, up = 0, down = 0, left = 0, right = 0;
-
-        // cout<<"collect = ";
-        for (auto &collect: collected){
-            // cout<<collect<<" ";
-            up = __INT32_MAX__, down = __INT32_MAX__, left = __INT32_MAX__, right = __INT32_MAX__;
-            vector<string> loc = split_string_find(collect, ",");
-            row = stoi(loc[0]); col = stoi(loc[1]);
-
-            if (row > 0 && (collected.find(to_string(row-1) + "," + to_string(col)) == collected.end()))
-                up = heightMap[row - 1][col];
-            if (row < (heightMap.size() - 1) && (collected.find(to_string(row+1) + "," + to_string(col)) == collected.end()))
-                down = heightMap[row + 1][col];
-            if (col > 0 && (collected.find(to_string(row) + "," + to_string(col-1)) == collected.end()))
-                left = heightMap[row][col - 1];
-            if (col < (heightMap[0].size() - 1) && (collected.find(to_string(row) + "," + to_string(col+1)) == collected.end()))
-                right = heightMap[row][col + 1];
-
-            int min1, min2, min3, minIndex1, minIndex2, minIndex3;
-
-            min1 = min(up, down);
-            min2 = min(left, right);
-            min3 = min(min1, min2);
-
-            minheight = min(minheight, min3);           
-        }
-
-        return minheight;
-    }
 
     int trapRainWater(vector<vector<int>> &heightMap)
     {
-        int area = 0;
-        if (heightMap.size() <= 2 || heightMap[0].size() <= 2)
-            return area;
+        int area = 0, poppedHeight = 0, neighborHeight = 0, height = 0;
+        int m = heightMap.size();
+        int n = heightMap[0].size();
+        pair<int, pair<int, int>> top;
+        priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> pq;
+        vector<vector<bool>> visited(m, vector<bool>(n, false));
 
-        vector<pair<int, int>> current;
+        for (int j=0;j<n;j++){
+            pq.push({heightMap[0][j], {0, j}});
+            pq.push({heightMap[m-1][j], {m-1, j}});
+            visited[0][j] = true;
+            visited[m-1][j] = true;
+        }
 
-        int row = heightMap.size();
-        int col = heightMap[0].size();
-        int maxLevel = __INT32_MAX__;
-        int up, down, left, right;
-        bool found = false; int minBorder = 0;
-        int borderLevel = -1;
+        for (int i=1;i<(m-1);i++){
+            pq.push({heightMap[i][0], {i, 0}});
+            pq.push({heightMap[i][n-1], {i, n-1}});
+            visited[i][n-1] = true;
+            visited[i][0] = true;
+        }
+        
+        while (!pq.empty()){
+            top = pq.top();
+            pq.pop();
+            int row = top.second.first, col = top.second.second;
 
-        for (int i = 1; i < row - 1; i++)
-        {
-            up = i;
-            down = i;
-
-            for (int j = 1; j < col - 1; j++)
-            {
-                string prepare = to_string(i) + "," + to_string(j);
-                if (calculated.count(prepare)) continue;
-
-                left = j;
-                right = j;
-
-                queue<pair<int, int>> que;
-                que.push({i, j});
-                found = false;
-                borderLevel = -1;
-
-                while (!que.empty())
-                {
-                    int size = que.size();
-                    for (int k = 0; k < size; k++)
-                    {
-                        pair<int, int> p = que.front();
-                        que.pop();
-                        if (visited.find(to_string(p.first) + "," + to_string(p.second)) != visited.end()) continue;
-
-                        // problem is finding the very min height of border surrounding our selected contiguous region
-                        maxLevel = maxSurrounding(heightMap, p.first, p.second);
-                        // maxLevel = min(maxLevel, surrounding(heightMap, p.first, p.second));
-                        visited.insert(to_string(p.first) + "," + to_string(p.second));
-                        collected.insert(to_string(p.first) + "," + to_string(p.second));
-                        calculated.insert(to_string(p.first) + "," + to_string(p.second));
-                        current.push_back({p.first, p.second});
-                        
-                        if (maxLevel > heightMap[p.first][p.second]){
-                            found = true;
-                            borderLevel = findActualHeight(heightMap, p.first, p.second);
-                            if (maxLevel > borderLevel) maxLevel = borderLevel;
-                            // cout<<"maxlevel = "<<maxLevel<<", borderLevel = "<<borderLevel<<", x,y = "<<p.first<<","<<p.second<<endl;
-                            area += maxLevel - heightMap[p.first][p.second];
-                            heightMap[p.first][p.second] = maxLevel;
-                        } else if (maxLevel < heightMap[p.first][p.second]) continue;
- 
-                        if ((p.first-1) > 0 && (heightMap[p.first - 1][p.second] <= heightMap[p.first][p.second]))
-                        {
-                            que.push({p.first - 1, p.second});
-                        }
-                        if ((p.first+1) < (row - 1) && (heightMap[p.first + 1][p.second] <= heightMap[p.first][p.second]))
-                        {
-                            que.push({p.first + 1, p.second});
-                        }
-                        if ((p.second-1) > 0 && (heightMap[p.first][p.second - 1] <= heightMap[p.first][p.second]))
-                        {
-                            que.push({p.first, p.second - 1});
-                        }
-                        if ((p.second+1) < (col - 1) && (heightMap[p.first][p.second + 1] <= heightMap[p.first][p.second]))
-                        {
-                            que.push({p.first, p.second + 1});
-                        } 
-                    }
-                }
-
-                if (found){
-                    for (auto &p : current)
-                    {
-                        if (maxLevel <= heightMap[p.first][p.second]) continue;
-                        area += maxLevel - heightMap[p.first][p.second];
-                        heightMap[p.first][p.second] = maxLevel;
-                    }
-    
-                }
-                maxLevel = __INT32_MAX__;
-                borderLevel = -1;
-                visited.clear();
-                collected.clear();
-                current.clear();
+            if (row > 0 && !visited[row-1][col]){
+                height = max(top.first, heightMap[row-1][col]);
+                area += max(0, top.first - heightMap[row-1][col]);
+                pq.push({height, {row-1, col}});
+                visited[row-1][col] = true;
+            }
+            if (row < m-1 && !visited[row+1][col]){
+                height = max(top.first, heightMap[row+1][col]);
+                area += max(0, top.first - heightMap[row+1][col]);
+                pq.push({height, {row+1, col}});
+                visited[row+1][col] = true;
+            }
+            if (col < n-1 && !visited[row][col+1]){
+                height = max(top.first, heightMap[row][col+1]);
+                area += max(0, top.first - heightMap[row][col+1]);
+                pq.push({height, {row, col+1}});
+                visited[row][col+1] = true;
+            }
+            if (col > 0 && !visited[row][col-1]){
+                height = max(top.first, heightMap[row][col-1]);
+                area += max(0, top.first - heightMap[row][col-1]);
+                pq.push({height, {row, col-1}});
+                visited[row][col-1] = true;
             }
         }
 
@@ -246,11 +125,11 @@ int main()
     Solution s;
     vector<vector<int>> heightMap;
 
-    // heightMap = {{1, 4, 3, 1, 3, 2}, {3, 2, 1, 3, 2, 4}, {2, 3, 3, 2, 3, 1}};
-    // cout << s.trapRainWater(heightMap) << endl;
+    heightMap = {{1, 4, 3, 1, 3, 2}, {3, 2, 1, 3, 2, 4}, {2, 3, 3, 2, 3, 1}};
+    cout << s.trapRainWater(heightMap) << endl;
 
-    heightMap = {{3,3,3,3,3},{3,2,2,2,3},{3,2,1,2,3},{3,2,2,2,3},{3,3,3,3,3}};
-    cout<<s.trapRainWater(heightMap)<<endl;
+    // heightMap = {{3,3,3,3,3},{3,2,2,2,3},{3,2,1,2,3},{3,2,2,2,3},{3,3,3,3,3}};
+    // cout<<s.trapRainWater(heightMap)<<endl;
 
     // heightMap = {{12,13,1,12}, {13,4,13,12}, {13,8,10,12}, {12,13,12,12}, {13,13,13,13}};
     // cout<<s.trapRainWater(heightMap)<<endl;
