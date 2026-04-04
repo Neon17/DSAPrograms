@@ -14,7 +14,7 @@
  */
 
  /**
- * Approach 1(experimental heuristic): (my first tried approach by myself)
+ * Approach 1(experimental heuristic): (my first tried approach by myself but failed)
  * 
  * 1. Build a dp array where dp[i] = total profit of the current continuous rising streak
  *    ending at day i. When price drops, dp[i] is left as 0 (implicitly resetting the streak).
@@ -42,6 +42,14 @@
  * It is kept for educational and self‑tracking purposes only.
   */
 
+/**
+ * Approach 2(DP): (actual solution solved from high level algorithm)
+ * 
+ * Just do this: for each i, calculate max profit for left side 0 to i and store in left[i] (considering one transaction)
+ * and calculate max profit for right side i+1 to n-1 and store in left[i] (considering one transaction)
+ * then, in another loop, add those left and right and assign to total if total is less than sum
+ */
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -49,7 +57,7 @@ using namespace std;
 
 class Solution {
 public:
-    int maxProfit(vector<int>& prices) {
+    int maxHeuristicProfit(vector<int>& prices) {
         int n = prices.size();
         if (n == 0) return 0;
         vector<int> dp(n, 0);
@@ -87,6 +95,9 @@ public:
             }
         }
 
+        // I have done one boundary check only, I have to check and expand both boundaries
+        // secondMaxIndex is not fixed, It can more or less than that, because we already worked previously by local maxima
+        int maxi = prices[secondMaxIndex];
         int min = prices[secondMaxIndex], minIndex = secondMaxIndex;
         for (int i=secondMaxIndex-1;i>=0;i--){
             if (i >= rangeStart && i <= rangeEnd) break;
@@ -110,6 +121,40 @@ public:
 
         return max + secondMax;
     }
+
+    // left[i] has max prices on 0 to equal to ith part
+    // right[i] has max prices on i+1 to size-1 part
+    int maxProfit(vector<int>& prices){
+        int total = 0, n = prices.size();
+        if (n <= 1) return total;
+        vector<int> left(n, 0), right(n, 0);
+
+        int mini = prices[0];
+        for (int i=1;i<n;i++){
+            if (mini > prices[i]){
+                mini = prices[i];
+                left[i] = left[i-1];
+            } else {
+                left[i] = max(left[i-1], prices[i]-mini);
+            }
+        }
+
+        int maxi = prices[n-1];
+        for (int i=n-2;i>=0;i--){
+            if (maxi < prices[i]){
+                maxi = prices[i];
+                right[i] = right[i+1];
+            } else {
+                right[i] = max(right[i+1], maxi - prices[i]);
+            }
+        }
+
+        for (int i=0;i<n; i++){
+            total = max(total, left[i]+right[i]);
+        }
+
+        return total;
+    }
 };
 
 int main() {
@@ -130,6 +175,10 @@ int main() {
 
     prices = {1,5,2,6,3,7};
     cout<<s.maxProfit(prices)<<endl; // expected 9
+
+    // But Heuristic approach doesn't work on this
+    prices = {1,3,5,4,3,7,6,9,2,4};
+    cout<<s.maxProfit(prices)<<endl; // expected 10
 
     return 0;
 }
