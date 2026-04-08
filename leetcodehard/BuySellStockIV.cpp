@@ -27,53 +27,96 @@
  * Accepted 707,138/1.4M Acceptance Rate 49.8%
  */
 
- /**
-  * My approach: I will try BruteForce first, then I will try to optimize it using Dynamic Programming.
-  * BruteForce: I will try all possible combinations of buy and sell, and I will keep track of the maximum profit. This approach will have a time complexity of O(n^k), where n is the number of days and k is the number of transactions.
-  */
+/**
+ * Approach 1 (Brute Force – first attempt):
+ *   Recursively try all possible non‑overlapping segments as transactions.
+ *   For each segment, compute the best profit using a single‑transaction
+ *   O(segment length) scan. The recursion explores all ways to choose up to
+ *   k segments. Time complexity: O(C(n, 2k)) – exponential, too slow for n=1000.
+ *
+ * Approach 2 (Top‑down DP with memoization – current):
+ *   Memoize the brute‑force recursion using a key (k, index, step, holding).
+ *   step represents the length of the current transaction being considered.
+ *   This reduces repeated calculations but still has O(n²·k) states, which is
+ *   too large for the given constraints (n=1000, k=100). The use of unordered_map
+ *   with string keys adds further overhead. Works for small inputs only.
+ *
+ * TODO: Optimize to O(n·k) using state (i, k, holding) – the standard solution.
+ */
 
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
 using namespace std;
 
 class Solution {
 public:
-    int maxBruteforce(vector<int>& prices, int startIndex, int endIndex){
-        int maxi = 0;
-        if (startIndex < 0) return 0;
-        int mini = prices[startIndex];
+    unordered_map<string, int> dp; // key: index + step + k + holding, value: max profit
 
-        // cout<<"startIndex: " << startIndex << ", endIndex: " << endIndex << ", maxProfit: " << maxi << endl;
+    int maxBruteforce(vector<int>& prices, int index = 0, int step = 0){
+        int maxi = 0;
+        if (step <= 0 || index <0 || index+step >= prices.size()) return 0;
+        int mini = prices[index];
+
         
-        for (int i=startIndex+1;i<=endIndex;i++){
-            if (mini > prices[i]) mini = prices[i];
-            else maxi = max(maxi, prices[i] - mini);
+        for (int i=1;i<=step;i++){
+            if (mini > prices[index+i]) mini = prices[index+i];
+            else maxi = max(maxi, prices[index+i] - mini);
         }
         
+        // cout<<"startIndex: " << choose[0] << ", endIndex: " << choose[choose.size()-1] << ", maxProfit: " << maxi << endl;
         return maxi;
     }
 
-    int dfs( int k, vector<int> prices, int index=-1, int step=0, int depth = 0){
-        // we can take any steps from 1 to remaining part
-        if (depth >= k || (index >= 0 && index+step >= prices.size())) return 0;
-        int n = prices.size();
-        int maxp = 0, stepp = 0;
-        int temp = maxBruteforce(prices, index, index+step);
-        int tempp = 0; maxp = temp;
-        int depthp = (temp > 0 && index!=-1)? depth+1: depth;
+    string getKey(int k, int index, int step, bool holding){
+        return to_string(k) + "-" + to_string(index) + "-" + to_string(step) + "-" + to_string(holding);
+    }
 
-        for (int i=index+step+1;i<n;i++){
-            tempp = temp + dfs(k, prices, index+step+1, stepp, depthp);
-            maxp = max(tempp, maxp);
-            stepp++;
+    string setKey(int k, int index, int step, bool holding, int value){
+        string key = getKey(k, index, step, holding);
+        dp[key] = value;
+        return key;
+    }
+
+    int dfs( int k, vector<int> prices, int& step, int index=0, bool holding = false){
+        // we can memoize it by dp[index][step][k][holding] = maxp; but it will be too large
+
+        if (k<=0 || index+step >= prices.size()) return 0;
+        string key = getKey(k, index, step, holding);
+        if (dp.find(key) != dp.end()) return dp[key];
+
+        int n = prices.size();
+        int maxp = 0, dfs1 = 0, dfs2 = 0, temp=0, tempo = 0, newindex = 0;
+        
+        if (holding){
+            // we can ignore or sell
+            step++;
+            dfs1 = dfs(k, prices, step, index, true); 
+            step--;
+            temp = maxBruteforce(prices, index, step);
+            newindex = index + step + 1;
+            tempo = step; step = 0;
+            dfs2 = temp + dfs(k-1, prices, step, newindex, false);
+            step = tempo;
+        } else {
+            // we can ignore or buy
+            dfs1 = dfs(k, prices, step, index+1, false);
+            step++;
+            dfs2 = dfs(k, prices, step, index, true);
+            step--;
         }
 
+        maxp = max(dfs1, dfs2);
+        dp[key] = maxp;
         return maxp;
     }
 
     int maxProfit(int k, vector<int>& prices) {
-        return dfs(k, prices);
+        vector<int> choose;
+        int step = 0;
+        dp.clear();
+        return dfs(k, prices, step);
     }
 };
 
