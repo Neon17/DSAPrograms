@@ -40,7 +40,16 @@
  *   This reduces repeated calculations but still has O(n²·k) states, which is
  *   too large for the given constraints (n=1000, k=100). The use of unordered_map
  *   with string keys adds further overhead. Works for small inputs only.
+ * 
+ * 
+ * Approach 3 (Correct Top‑down DP – “aha!” moment):
+ *   Wait… it’s just brute force! We don’t need to track path, mini, or profit.
+ *   Trying all buy/sell combinations recursively: buy = subtract price, sell = add price.
+ *   The recursion explores every possibility, so the max will naturally appear.
+ *   State = (day, transactions left, holding). Clean O(n·k) with memoization.
+ *   (Finally got it – sometimes overthinking kills simplicity.)
  *
+ * 
  * TODO: Optimize to O(n·k) using state (i, k, holding) – the standard solution.
  */
 
@@ -52,38 +61,16 @@ using namespace std;
 
 class Solution {
 public:
-    unordered_map<string, int> dp; // key: index + step + k + holding, value: max profit
+    unordered_map<string, int> dp; // key: index + k + holding, value: max profit
 
-    int maxBruteforce(vector<int>& prices, int index = 0, int step = 0){
-        int maxi = 0;
-        if (step <= 0 || index <0 || index+step >= prices.size()) return 0;
-        int mini = prices[index];
-
-        
-        for (int i=1;i<=step;i++){
-            if (mini > prices[index+i]) mini = prices[index+i];
-            else maxi = max(maxi, prices[index+i] - mini);
-        }
-        
-        // cout<<"startIndex: " << choose[0] << ", endIndex: " << choose[choose.size()-1] << ", maxProfit: " << maxi << endl;
-        return maxi;
+    string getKey(int index, int k, bool holding){
+        return to_string(k) + "-" + to_string(index) + "-" + to_string(holding);
     }
 
-    string getKey(int k, int index, int step, bool holding){
-        return to_string(k) + "-" + to_string(index) + "-" + to_string(step) + "-" + to_string(holding);
-    }
+    int dfs( int k, vector<int> prices, int index=0, bool holding = false) {
 
-    string setKey(int k, int index, int step, bool holding, int value){
-        string key = getKey(k, index, step, holding);
-        dp[key] = value;
-        return key;
-    }
-
-    int dfs( int k, vector<int> prices, int& step, int index=0, bool holding = false){
-        // we can memoize it by dp[index][step][k][holding] = maxp; but it will be too large
-
-        if (k<=0 || index+step >= prices.size()) return 0;
-        string key = getKey(k, index, step, holding);
+        if (k<=0 || index >= prices.size()) return 0;
+        string key = getKey(index, k, holding);
         if (dp.find(key) != dp.end()) return dp[key];
 
         int n = prices.size();
@@ -91,20 +78,12 @@ public:
         
         if (holding){
             // we can ignore or sell
-            step++;
-            dfs1 = dfs(k, prices, step, index, true); 
-            step--;
-            temp = maxBruteforce(prices, index, step);
-            newindex = index + step + 1;
-            tempo = step; step = 0;
-            dfs2 = temp + dfs(k-1, prices, step, newindex, false);
-            step = tempo;
+            dfs1 = dfs(k, prices, index+1, true); 
+            dfs2 = prices[index] + dfs(k-1, prices, index+1, false);
         } else {
             // we can ignore or buy
-            dfs1 = dfs(k, prices, step, index+1, false);
-            step++;
-            dfs2 = dfs(k, prices, step, index, true);
-            step--;
+            dfs1 = dfs(k, prices, index+1, false);
+            dfs2 = dfs(k, prices, index+1, true) - prices[index];
         }
 
         maxp = max(dfs1, dfs2);
@@ -114,9 +93,8 @@ public:
 
     int maxProfit(int k, vector<int>& prices) {
         vector<int> choose;
-        int step = 0;
         dp.clear();
-        return dfs(k, prices, step);
+        return dfs(k, prices);
     }
 };
 
