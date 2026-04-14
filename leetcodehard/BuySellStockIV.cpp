@@ -49,12 +49,18 @@
  *   State = (day, transactions left, holding). Clean O(n·k) with memoization.
  *   (Finally got it – sometimes overthinking kills simplicity.)
  *
- * 
- * TODO: Optimize to O(n·k) using state (i, k, holding) – the standard solution.
+ * Approach 4 – Bottom‑up DP using local minima (my derived solution):
+ *   Observed that optimal buys occur only at local minima. Precompute these indices.
+ *   Then dp[t][i] = max(dp[t][i-1], max over local minima m < i of (dp[t-1][m] + prices[i] - prices[m])).
+ *   Time complexity O(k·n·m) where m ≈ n/2 → O(k·n²) worst case. Passes given constraints but not optimal.
+ *
+ * TODO: Derive the standard bottom‑up DP with O(k·n) time and O(k·n) space (or O(n) with space opt).
+ *       Key idea: maintain a running maxDiff 
  */
 
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <algorithm>
 #include <unordered_map>
 using namespace std;
@@ -91,10 +97,55 @@ public:
         return maxp;
     }
 
+    int calculateMaxProfit(vector<int>& prices, int start=0, int end=-1){
+        if (end <= start) return 0;
+        int mini = prices[start], maxi = prices[start], maxprofit = 0;
+
+        for (int i=start+1;i<=end;i++){
+            if (mini < prices[i]) mini = prices[i];
+            maxprofit = max(maxprofit, prices[i]-mini);
+        }
+        return maxprofit;
+    }
+
+    int convertToBottomUp(int k, vector<int>& prices){
+        int n = prices.size(), i=0, j=0, tk=0;
+        vector<vector<int>> bp(k+1, vector<int>(n+1, 0));
+        vector<int> minindex;
+        int maxDiff = 0;
+
+        for (int i=0;i<n-1;i++){
+            if (i>0 && prices[i] <= prices[i+1] && prices[i] <= prices[i-1]){
+                minindex.push_back(i);
+            } else if (i==0){
+                if (prices[i] < prices[i+1]) minindex.push_back(i);
+            }
+        }
+
+        for (int j=1;j<=k;j++){
+            for (int i=1;i<=n;i++){
+                maxDiff = 0;
+                for (int m = 0; m<minindex.size();m++){
+                    if (minindex[m] >= i) break;
+                    maxDiff = max(bp[j-1][minindex[m]] + prices[i-1] - prices[minindex[m]], maxDiff);
+                }
+                bp[j][i] = max(bp[j][i-1], maxDiff);
+            }
+        }
+
+        return bp[k][n];
+    }
+
+    int standardBottomUp(int k, vector<int>& prices){
+        // todo
+        return 0;
+    }
+
     int maxProfit(int k, vector<int>& prices) {
         vector<int> choose;
         dp.clear();
-        return dfs(k, prices);
+        // return dfs(k, prices);
+        return convertToBottomUp(k, prices);
     }
 };
 
@@ -110,6 +161,24 @@ int main() {
 
     k = 2; prices = {3,2,6,5,0,3};
     cout << "Input: k = " << k << ", Output = " << s.maxProfit(k, prices) << endl; // expected output: 7
+
+    k = 4; prices = {1, 5, 2, 3, 7, 6, 4, 8, 1, 9};
+    cout << "Input: k = " << k << ", Output = " << s.maxProfit(k, prices) << endl; // expected output: 21
+
+    k = 5; prices = {5, 4, 3, 2, 1};
+    cout << "Input: k = " << k << ", Output = " << s.maxProfit(k, prices) << endl; // expected output: 0
+
+    k = 1; prices = {1,2,2,2,3};
+    cout << "Input: k = " << k << ", Output = " << s.maxProfit(k, prices) << endl; // expected output: 2
+
+    k = 3; prices = {1, 10, 2, 9, 3, 8};
+    cout << "Input: k = " << k << ", Output = " << s.maxProfit(k, prices) << endl; // expected output: 21
+
+    k = 2; prices = {1, 10, 2, 9, 3, 8};
+    cout << "Input: k = " << k << ", Output = " << s.maxProfit(k, prices) << endl; // expected output: 16
+
+    k = 100; prices = {1,2,3,4,5};
+    cout << "Input: k = " << k << ", Output = " << s.maxProfit(k, prices) << endl; // expected output: 4
 
     return 0;
 }
