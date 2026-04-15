@@ -137,15 +137,37 @@ public:
     }
 
     int standardBottomUp(int k, vector<int>& prices){
-        // todo
-        return 0;
+        // looked standard solution after struggling with the above approaches. The key is to maintain a running maxDiff for each transaction count.
+        int n = prices.size();
+        if (n == 0 || k == 0) return 0;
+        
+        // If k is large enough, we can do unlimited transactions
+        if (k >= n / 2) {
+            int profit = 0;
+            for (int i = 1; i < n; i++)
+                if (prices[i] > prices[i-1])
+                    profit += prices[i] - prices[i-1];
+            return profit;
+        }
+        
+        vector<vector<int>> bp(k + 1, vector<int>(n, 0));
+        
+        for (int t = 1; t <= k; t++) {
+            int maxDiff = -prices[0]; // best value of (bp[t-1][j] - prices[j])
+            for (int i = 1; i < n; i++) {
+                bp[t][i] = max(bp[t][i-1], prices[i] + maxDiff);
+                maxDiff = max(maxDiff, bp[t-1][i] - prices[i]);
+            }
+        }
+        return bp[k][n-1];
     }
 
     int maxProfit(int k, vector<int>& prices) {
         vector<int> choose;
         dp.clear();
         // return dfs(k, prices);
-        return convertToBottomUp(k, prices);
+        // return convertToBottomUp(k, prices);
+        return standardBottomUp(k, prices);
     }
 };
 
