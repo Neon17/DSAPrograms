@@ -16,4 +16,5 @@
 !/leetcodehard/*.*
 !striverDPRevise
 /striverDPRevise/*
-!/striverDPRevise/*.*
+!/striverDPRevise/*.cpp
+!/striverDPRevise/*.c
