@@ -72,3 +72,8 @@
 /trees/*
 !/trees/*.cpp
 !/trees/*.c
+
+!divide-conquer
+/divide-conquer/*
+!/divide-conquer/*.cpp
+!/divide-conquer/*.c
