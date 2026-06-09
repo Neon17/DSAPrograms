@@ -77,3 +77,8 @@
 /divide-conquer/*
 !/divide-conquer/*.cpp
 !/divide-conquer/*.c
+
+!trie
+/trie/*
+!/trie/*.cpp
+!/trie/*.c
