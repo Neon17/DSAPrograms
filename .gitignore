@@ -82,3 +82,8 @@
 /trie/*
 !/trie/*.cpp
 !/trie/*.c
+
+!binarysearch
+/binarysearch/*
+!/binarysearch/*.cpp
+!/binarysearch/*.c
