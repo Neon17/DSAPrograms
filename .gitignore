@@ -87,3 +87,13 @@
 /binarysearch/*
 !/binarysearch/*.cpp
 !/binarysearch/*.c
+
+!matrix
+/matrix/*
+!/matrix/*.cpp
+!/matrix/*.c
+
+!slidingwindow
+/slidingwindow/*
+!/slidingwindow/*.cpp
+!/slidingwindow/*.c
