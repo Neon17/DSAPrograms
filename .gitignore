@@ -97,3 +97,8 @@
 /slidingwindow/*
 !/slidingwindow/*.cpp
 !/slidingwindow/*.c
+
+!codeforces
+/codeforces/*
+!/codeforces/*.cpp
+!/codeforces/*.c
