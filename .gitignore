@@ -102,3 +102,9 @@
 /codeforces/*
 !/codeforces/*.cpp
 !/codeforces/*.c
+
+
+!codeforces/contest 1109
+/codeforces/contest 1109/*
+!/codeforces/contest 1109/*.cpp
+!/codeforces/contest 1109/*.c
