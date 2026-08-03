@@ -108,3 +108,8 @@
 /codeforces/contest 1109/*
 !/codeforces/contest 1109/*.cpp
 !/codeforces/contest 1109/*.c
+
+!union-find
+/union-find/*
+!/union-find/*.cpp
+!/union-find/*.c
