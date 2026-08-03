@@ -3,6 +3,7 @@
 !/*.cpp
 !/*.c
 !/*.js
+!/.gitattributes
 
 !/Problem Solving
 /Problem Solving/*

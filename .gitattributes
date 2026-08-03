@@ -1,0 +1,13 @@
+# Normalize line endings so the same repo doesn't show spurious
+# git diff / mode changes when used from Windows and Linux (dual boot).
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
