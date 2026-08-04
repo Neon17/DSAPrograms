@@ -119,3 +119,8 @@
 /prefixSum/*
 !/prefixSum/*.cpp
 !/prefixSum/*.c
+
+!bitmask
+/bitmask/*
+!/bitmask/*.cpp
+!/bitmask/*.c
