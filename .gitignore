@@ -114,3 +114,8 @@
 /union-find/*
 !/union-find/*.cpp
 !/union-find/*.c
+
+!prefixSum
+/prefixSum/*
+!/prefixSum/*.cpp
+!/prefixSum/*.c
