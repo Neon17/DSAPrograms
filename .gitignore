@@ -129,3 +129,8 @@
 /bitmask/*
 !/bitmask/*.cpp
 !/bitmask/*.c
+
+!shortestpath
+/shortestpath/*
+!/shortestpath/*.cpp
+!/shortestpath/*.c
