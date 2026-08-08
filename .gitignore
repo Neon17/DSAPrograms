@@ -134,3 +134,8 @@
 /shortestpath/*
 !/shortestpath/*.cpp
 !/shortestpath/*.c
+
+!game_problems
+/game_problems/*
+!/game_problems/*.cpp
+!/game_problems/*.c
