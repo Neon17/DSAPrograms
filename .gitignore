@@ -17,7 +17,8 @@
 
 !/leetcodehard
 /leetcodehard/*
-!/leetcodehard/*.*
+!/leetcodehard/*.cpp
+!/leetcodehard/*.c
 
 !backtracking
 /backtracking/*
