@@ -140,3 +140,9 @@
 /game_problems/*
 !/game_problems/*.cpp
 !/game_problems/*.c
+
+
+!segmentTrees
+/segmentTrees/*
+!/segmentTrees/*.cpp
+!/segmentTrees/*.c
