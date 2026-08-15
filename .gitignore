@@ -146,3 +146,9 @@
 /segmentTrees/*
 !/segmentTrees/*.cpp
 !/segmentTrees/*.c
+
+!contests
+/contests/*
+!/contests/*.cpp
+!/contests/*.c
+!/contests/.gitignore
