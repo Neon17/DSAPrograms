@@ -96,8 +96,8 @@ public:
 
 class Solution {
 private:
-    vector<int> count;  // answer array
-    vector<pair<int, int>> arr;  // {value, original_index}
+    vector<int> count; 
+    vector<pair<int, int>> arr;
 
     void mergeSort(int left, int right) {
         if (left >= right) return;
@@ -108,37 +108,32 @@ private:
     }
 
     void merge(int left, int mid, int right) {
-        vector<pair<int, int>> temp;  // merged temporary array
-        int i = left;       // left half pointer
-        int j = mid + 1;    // right half pointer
-        int rightCount = 0; // number of right elements already placed
+        vector<pair<int, int>> temp; 
+        int i = left;      
+        int j = mid + 1;  
+        int rightCount = 0;
 
         while (i <= mid || j <= right) {
             if (i <= mid && j <= right && arr[i].first <= arr[j].first) {
-                // Take from left: all rightCount elements are strictly smaller
                 count[arr[i].second] += rightCount;
                 temp.push_back(arr[i]);
                 i++;
             } 
             else if (i <= mid && j <= right && arr[i].first > arr[j].first) {
-                // Take from right: increment rightCount
                 rightCount++;
                 temp.push_back(arr[j]);
                 j++;
             }
             else if (i <= mid) {
-                // Remaining left elements
                 count[arr[i].second] += rightCount;
                 temp.push_back(arr[i]);
                 i++;
             }
-            else { // j <= right
+            else {
                 temp.push_back(arr[j]);
                 j++;
             }
         }
-
-        // Copy temp back into arr
         for (int k = 0; k < temp.size(); k++) {
             arr[left + k] = temp[k];
         }
@@ -153,6 +148,56 @@ public:
             arr.push_back({nums[i], i});
         }
         mergeSort(0, n - 1);
+        return count;
+    }
+};
+
+class BinarySearchSolution {
+    // I tried this Binary Search Tree approach, it is correct but not that optimal, why?
+    // Because it is not self balancing, so in worst case it can be O(n^2) time complexity, 
+    // Insertion time = O(h) where h is height of tree, in worst case h = n (becoz unbalancing nature), so O(n^2)
+    // We have to create avl trees, balance at every insertion, learned how to do, but will not implement as it takes a lot of time and maynot irrelevant on interview
+
+    struct BinaryTree {
+        BinaryTree* left;
+        BinaryTree* right;
+        int val;
+        int ind;
+        int leftCount;
+        BinaryTree(): left(nullptr), right(nullptr), val(0), ind(0), leftCount(0){}
+        BinaryTree(int val): left(nullptr), right(nullptr), val(val), ind(0), leftCount(0){}
+        BinaryTree(int ind, int val): left(nullptr), right(nullptr), val(val), ind(ind), leftCount(0){}
+    };
+
+    BinaryTree* root;
+    vector<int> count;
+
+    void insert(BinaryTree* root, int& ind, int& val, int count=0){
+        if (!root) return;
+        if (val >= root->val) {
+            count += root->leftCount;
+            if (val > root->val) count++;
+            if (root->right) insert(root->right, ind, val, count);
+            else {
+                this->count[ind] = count;
+                root->right = new BinaryTree(ind, val);
+            }
+        } else {
+            root->leftCount++;
+            if (root->left) insert(root->left, ind, val, count);
+            else {
+                this->count[ind] = count;
+                root->left = new BinaryTree(ind, val);
+            }
+        }
+    }
+
+public:
+    vector<int> countSmaller(vector<int>& nums) {
+        root = nullptr;
+        count.resize(nums.size(), 0);
+        root = new BinaryTree(nums[nums.size()-1]);
+        for (int i=nums.size()-2; i>=0;i--) insert(root, i, nums[i]);
         return count;
     }
 };
