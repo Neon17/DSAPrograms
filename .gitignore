@@ -152,3 +152,11 @@
 !/contests/*.cpp
 !/contests/*.c
 !/contests/.gitignore
+
+!atcoder
+/atcoder/**
+!/atcoder/**/
+!/atcoder/**/*.cpp
+!/atcoder/**/*.c
+!/atcoder/.gitignore
+
