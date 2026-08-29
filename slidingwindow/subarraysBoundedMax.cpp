@@ -17,21 +17,37 @@ using namespace std;
 
 class Solution {
 public:
-    int numSubarrayBoundedMax(vector<int>& nums, int left, int right) {
-        int count = 0, leftidx = -1, rightidx = 0, n = nums.size();
-        int lastindex = -1; // last value of nums[rightidx] that is greater than the range [left, right]
+    // Below commented lines of code are my made clever 2 pointer approach to solve the problem
 
-        for (int i=0;i<nums.size();i++){
-            if (nums[i] > right) {
-                leftidx = i; lastindex = i; continue;
-            }
-            if (nums[i] < left && (leftidx == -1 || nums[leftidx] > right)) continue;
-            if (nums[i] >= left && nums[i] <= right){
-                count += i - lastindex;
-                leftidx = i;
-            } else count += leftidx - lastindex;
+    // int numSubarrayBoundedMax(vector<int>& nums, int left, int right) {
+    //     int count = 0, leftidx = -1, rightidx = 0, n = nums.size();
+    //     int lastindex = -1; // last value of nums[rightidx] that is greater than the range [left, right]
+
+    //     for (int i=0;i<nums.size();i++){
+    //         if (nums[i] > right) {
+    //             leftidx = i; lastindex = i; continue;
+    //         }
+    //         if (nums[i] < left && (leftidx == -1 || nums[leftidx] > right)) continue;
+    //         if (nums[i] >= left && nums[i] <= right){
+    //             count += i - lastindex;
+    //             leftidx = i;
+    //         } else count += leftidx - lastindex;
+    //     }
+    //     return count;
+    // }
+
+    // Below is standard solution to problem
+    int calculateBound(vector<int>& nums, int bound){
+        int curr = 0, count = 0;
+        for (int x: nums){
+            curr = x <= bound? curr + 1: 0;
+            count += curr;
         }
         return count;
+    }
+
+    int numSubarrayBoundedMax(vector<int>& nums, int left, int right) {
+        return calculateBound(nums, right) - calculateBound(nums, left-1);
     }
     
 };
