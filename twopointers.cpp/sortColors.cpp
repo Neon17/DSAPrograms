@@ -9,16 +9,51 @@ You must solve this problem without using the library's sort function.
 
 #include <iostream>
 #include <vector>
+#include <unordered_set>
 using namespace std;
+
+void printVector(const vector<int>& nums) {
+    for (int num : nums) {
+        cout << num << " ";
+    }
+    cout << endl;
+}
 
 class Solution {
 public:
     void sortColors(vector<int>& nums) {
-        
+       int low = 0, mid = 0, high = nums.size()-1;
+
+       while (mid <= high){
+            if (nums[mid] == 0){
+                swap(nums[mid], nums[low]);
+                mid++;
+                low++;
+            } else if (nums[mid] == 1){
+                mid++;
+            } else {
+                swap(nums[mid], nums[high]);
+                high--;
+            }
+       }
     }
 };
 
 int main(){
+    Solution sol;
+    vector<int> nums;
+
+    nums = {2,0,2,1,1,0};
+    sol.sortColors(nums);
+    printVector(nums); // Output: 0 0 1 1 2 2
+
+    nums = {2,0,1};
+    sol.sortColors(nums);
+    printVector(nums); // Output: 0 1 2
+
+    nums = {0};
+    sol.sortColors(nums);
+    printVector(nums); // Output: 0
 
     return 0;
 }
