@@ -160,3 +160,10 @@
 !/atcoder/**/*.c
 !/atcoder/.gitignore
 
+!maths
+/maths/**
+!/maths/**/
+!/maths/**/*.cpp
+!/maths/**/*.c
+!/maths/.gitignore
+
