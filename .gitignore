@@ -167,3 +167,10 @@
 !/maths/**/*.c
 !/maths/.gitignore
 
+!priority_queues
+/priority_queues/**
+!/priority_queues/**/
+!/priority_queues/**/*.cpp
+!/priority_queues/**/*.c
+!/priority_queues/.gitignore
+
