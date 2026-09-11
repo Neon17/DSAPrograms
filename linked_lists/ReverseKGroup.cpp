@@ -1,6 +1,18 @@
-// I am solving Leetcode 25. Reverse Nodes in k-Group (Hard), reversing nodes of a linked list k at a time and returning its modified list.
-// The topics are: Linked List, Recursion
-//
+/*
+    Leetcode Hard 25. Reverse Nodes in k-Group
+
+    Given the head of a linked list, reverse the nodes of the list k at a time, and return the modified list.
+
+    k is a positive integer and is less than or equal to the length of the linked list. 
+    If the number of nodes is not a multiple of k then left-out nodes, in the end, should remain as it is.
+
+    You may not alter the values in the list's nodes, only nodes themselves may be changed.
+
+    Constraints:
+        The number of nodes in the list is n.
+        1 <= k <= n <= 5000
+        0 <= Node.val <= 1000
+*/
 
 #include <iostream>
 #include <vector>
@@ -15,107 +27,83 @@ struct ListNode
     ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
 
-ListNode *reverseKGroup(ListNode *head, int k)
-{
-    ListNode *temp = head;
-    int count = 0;
-    while (temp != NULL)
-    {
-        count++;
-        temp = temp->next;
+void printList(ListNode* head) {
+    ListNode* current = head;
+    while (current != nullptr) {
+        cout << current->val << " ";
+        current = current->next;
     }
-    // cout << "Total Nodes = " << count << endl;
-
-    int groups = count / k;
-    if (groups == 0)
-        return head;
-
-    ListNode *combined = new ListNode();
-    ListNode *part[groups];
-
-    ListNode *curr = head;
-    // cout << "groups = " << groups << endl;
-    // cout << "k = " << k << endl;
-    count = 0;
-
-    for (int i = 0; i < groups; i++)
-    {
-        part[i] = nullptr;
-        // cout << "count = " << count << ", ";
-        // cout << "stopcriteria = " << (i + 1) * k << endl;
-        while (count < (i + 1) * k)
-        {
-            count++;
-            ListNode *next = curr->next;
-            curr->next = part[i];
-            part[i] = curr;
-            curr = next;
-        }
-        count = i * k + k;
-    }
-
-    ListNode *tempo = part[0];
-    for (int i = 1; i < groups; i++)
-    {
-        while (tempo->next != nullptr)
-        {
-            tempo = tempo->next;
-        }
-        tempo->next = part[i];
-    }
-    while (tempo->next != NULL)
-    {
-        tempo = tempo->next;
-    }
-    tempo->next = curr;
-    return part[0];
+    cout << endl;
 }
+
+class Solution {
+public:
+    void reverse(ListNode*& head){
+        if (!head) return;
+        ListNode dummy(0);
+        dummy.next = head;
+        ListNode* temp = dummy.next;
+
+        while (temp->next){
+            ListNode* next = temp->next;
+            temp->next = temp->next->next;
+            next->next = dummy.next;
+            dummy.next = next;            
+        }
+        head = dummy.next;
+    }
+
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        if (k <= 1) return head;
+        ListNode dummy(0);
+        dummy.next = head;
+        int i = 0;
+
+        ListNode* prevGroupEnd = &dummy;
+        ListNode* currGroupStart = &dummy;
+        ListNode* newGroupStart = head;
+        ListNode* temp = head;
+
+        while (temp){
+            currGroupStart = temp;
+            for (i=1;i<k;i++) {
+                if (!temp) break;
+                temp = temp->next;
+            }
+            if (i < k || !temp) break;
+            newGroupStart = temp->next;
+            temp->next = nullptr;
+            temp = currGroupStart;
+
+            reverse(temp);
+            prevGroupEnd->next = temp;
+            currGroupStart->next = newGroupStart;
+            prevGroupEnd = currGroupStart;
+            temp = newGroupStart;
+        } 
+        return dummy.next;
+    }
+};
 
 int main()
 {
-    // ListNode *test = new ListNode(1);
-    // test->next = new ListNode(2);
-    // test->next->next = new ListNode(3);
-    // test->next->next->next = new ListNode(4);
-    // test->next->next->next->next = new ListNode(5);
-    // test->next->next->next->next->next = nullptr;
+    Solution sol; ListNode* head, *ans;
 
-    // [8,0,4,0,1,6,2,4,5,6]
-    int arr[] = {8, 0, 4, 0, 1, 6, 2, 4, 5, 6};
+    head = new ListNode(1);
+    head->next = new ListNode(2);
+    head->next->next = new ListNode(3);
+    head->next->next->next = new ListNode(4);
+    head->next->next->next->next = new ListNode(5);
+    ans = sol.reverseKGroup(head, 2);
+    printList(ans);
 
-    ListNode *test = new ListNode(arr[0]);
-    ListNode *temp = test;
-    for (int i = 1; i < (sizeof(arr) / sizeof(arr[0])); i++)
-    {
-        temp->next = new ListNode(arr[i]);
-        temp = temp->next;
-    }
-        cout << " Original = ";
-    temp = test;
-    while (temp != NULL)
-    {
-        cout << temp->val << " ";
-        temp = temp->next;
-    }
-    cout<<endl;
+    head = new ListNode(1);
+    head->next = new ListNode(2);
+    head->next->next = new ListNode(3);
+    head->next->next->next = new ListNode(4);
+    head->next->next->next->next = new ListNode(5);
+    ans = sol.reverseKGroup(head, 3);
+    printList(ans);
 
-    ListNode *test1 = reverseKGroup(test, 2);
-
-    cout << " Original = ";
-    temp = test;
-    while (temp != NULL)
-    {
-        cout << temp->val << " ";
-        temp = temp->next;
-    }
-    cout<<endl;
-
-    cout << "After reversing = ";
-    while (test1 != NULL)
-    {
-        cout << test1->val << " ";
-        test1 = test1->next;
-    }
-    cout<<endl;
     return 0;
 }
