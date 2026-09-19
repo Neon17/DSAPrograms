@@ -29,6 +29,12 @@
 /dynamic_programming/*
 !/dynamic_programming/*.cpp
 !/dynamic_programming/*.c
+!/dynamic_programming/lis/
+!/dynamic_programming/lis/**
+/dynamic_programming/lis/*
+!/dynamic_programming/lis/*.cpp
+!/dynamic_programming/lis/*.c
+!/dynamic_programming/lis/*.md
 
 !graphs
 /graphs/*
@@ -171,6 +177,18 @@
 /priority_queues/**
 !/priority_queues/**/
 !/priority_queues/**/*.cpp
-!/priority_queues/**/*.c
+!priority_queues/**/*.c
 !/priority_queues/.gitignore
 
+!/shortestPath
+/shortestPath/*
+!/shortestPath/*.cpp
+!/shortestPath/*.c
+
+!/striverDPRevise
+/striverDPRevise/*
+!/striverDPRevise/*.cpp
+!/striverDPRevise/*.c
+
+!/**/README.md
+!/**/readme.md
