@@ -190,5 +190,11 @@
 !/striverDPRevise/*.cpp
 !/striverDPRevise/*.c
 
+!/systemDesign
+/systemDesign/*
+!/systemDesign/*.cpp
+!/systemDesign/*.c
+!/systemDesign/*.gitignore
+
 !/**/README.md
 !/**/readme.md
