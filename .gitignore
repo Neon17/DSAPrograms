@@ -4,6 +4,7 @@
 !/*.c
 !/*.js
 !/.gitattributes
+!*/
 
 !/Problem Solving
 /Problem Solving/*
@@ -198,3 +199,5 @@
 
 !/**/README.md
 !/**/readme.md
+!/todo.md
+!/leetcode_stats.md
